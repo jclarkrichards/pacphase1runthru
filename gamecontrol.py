@@ -22,7 +22,9 @@ class GameController(object):
         self.displayedFruits = []
         self.displayedLevel = 0
         self.maxLevels = 1
-        
+        self.startDelay= False
+        self.restartDelay = False
+
     def setBackGround(self):
         self.screen = pygame.display.set_mode(SCREENSIZE, 0, 32)
         self.background = pygame.surface.Surface(SCREENSIZE).convert()
@@ -36,14 +38,22 @@ class GameController(object):
         self.fruit = None
         self.fruitTimer = 0
         self.paused = True
-        
+        self.pauseTimer = 0
+        self.pauseTime = 0
+        self.playerPaused = True
+        self.startDelay = False
+
     def restartLevel(self):
         self.pacman = Pacman(self.nodes, self.level)
         self.ghosts = GhostGroup(self.nodes, self.level)
         self.paused = True
         self.fruit =None
         self.fruitTimer = 0
-        
+        self.pauseTimer = 0
+        self.pauseTime = 0
+        self.playerPaused = True
+        self.restartDelay = False
+
     def update(self):
         dt = self.clock.tick(30)/1000.0
         if not self.paused:
@@ -52,6 +62,15 @@ class GameController(object):
             self.checkPelletEvents(dt)
             self.checkGhostEvents(dt)
             self.checkFruitEvents(dt)
+        else:
+            if not self.playerPaused:
+                self.pauseTimer += dt
+                if self.pauseTimer >= self.pauseTime:
+                    self.paused = False
+                    if self.startDelay == True:
+                        self.startGame()
+                    if self.restartDelay == True:
+                        self.restartLevel()
         self.checkEvents()
         self.render()
 
@@ -61,6 +80,12 @@ class GameController(object):
                 exit()
             if event.type == KEYDOWN:
                 if event.key == K_SPACE:
+                    if self.paused:
+                        #self.paused = False
+                        self.playerPaused = False
+                    else:
+                        #self.paused = True
+                        self.playerPaused = True
                     self.paused = not self.paused
                     
     def checkPelletEvents(self, dt):
@@ -75,8 +100,12 @@ class GameController(object):
                 self.ghostScore = 200
                 self.ghosts.setFreightMode()
             if self.pellets.isEmpty():
+                self.paused = True
+                self.pauseTime = 3
+                self.pauseTimer = 0
+                self.startDelay = True
                 self.increaseLevel()
-                self.startGame()
+
             if self.ghosts.anyInFreightOrSpawn():
                 self.pacman.boostSpeed()
             else:
@@ -101,15 +130,21 @@ class GameController(object):
                 self.score += self.ghostScore
                 self.ghostScore *= 2
                 ghost.setRespawnMode()
+                self.paused = True
+                self.pauseTime = 0.5
+                self.pauseTimer = 0
             elif ghost.mode.name != "SPAWN":
+                self.paused = True
+                self.pauseTime = 1
+                self.pauseTimer = 0
+                self.restartDelay = True
                 self.lives -= 1
                 if self.lives == 0:
                     self.lives = 5
                     self.startGame()
-                self.restartLevel()
+
 
         if self.pellets.numEaten >= 30 or self.idleTimer >= 10:
-            print "release INKY"
             self.ghosts.release("inky")
         if self.pellets.numEaten >= 60 or self.idleTimer >= 10:
             self.ghosts.release("clyde")

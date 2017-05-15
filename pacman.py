@@ -10,7 +10,8 @@ class Pacman(MazeMouse):
         self.name = "pacman"
         self.color = YELLOW
         self.setStartPosition()
-        
+        self.r = 4
+
     def update(self, dt):
         self.position += self.direction*self.speed*dt
         direction = self.getValidKey()
@@ -69,7 +70,7 @@ class Pacman(MazeMouse):
     def eatObject(self, obj):
         d = self.position - obj.position
         dSquared = d.magnitudeSquared()
-        rSquared = (self.radius + obj.radius)**2
+        rSquared = 4 * self.r**2
         if dSquared <= rSquared:
             return True
         return False

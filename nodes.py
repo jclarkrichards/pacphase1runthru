@@ -27,7 +27,7 @@ class NodeGroup(object):
         self.nodeList = []
         self.grid = None
         self.nodeStack = Stack()
-        self.createNodeList(MAZEDATA[level]["file"], self.nodeList)
+        self.nodeSymbols = ["+", "n", "N", "M", "H", "F"]
         self.homeList = []
         self.createMainList()
         self.createHomeList()
@@ -67,7 +67,6 @@ class NodeGroup(object):
                 return node
         return None
 
-
     def getNodeFromNode(self, node, nodeList):
         if node is not None:
             for inode in nodeList:
@@ -84,10 +83,7 @@ class NodeGroup(object):
         nodeFound = False
         for row in range(rows):
             for col in range(cols):
-                if (self.grid[row][col] == "+" or
-                    self.grid[row][col] == "n" or
-                    self.grid[row][col] == "N"):
-
+                if self.grid[row][col] in self.nodeSymbols:
                     return Node(row, col)
         return None
 
@@ -102,7 +98,8 @@ class NodeGroup(object):
 
     def nodeInList(self, node, nodeList):
         for inode in nodeList:
-            if node.position.x == inode.position.x and node.position.y == inode.position.y:
+            if (node.position.x == inode.position.x and 
+                node.position.y == inode.position.y):
                 return True
         return False
 
@@ -123,23 +120,29 @@ class NodeGroup(object):
             self.grid[row][col] == "p" or
             self.grid[row][col] == "P" or
             self.grid[row][col] == "+"):
-            while (self.grid[row][col] != "+" and
-                   self.grid[row][col] != "N" and
-                   self.grid[row][col] != "n"):
-        
+            while self.grid[row][col] not in self.nodeSymbols:
                 if direction is LEFT: col -= 1
                 elif direction is RIGHT: col += 1
                 elif direction is UP: row -= 1
                 elif direction is DOWN: row += 1
+            self.updateMazeData(self.grid[row][col], row, col)
             return Node(row, col)
         else:
             return None
 
+    def updateMazeData(self, symbol, row, col):
+        if symbol == "M":
+            MAZEDATA[self.level]["start"]["pacman"] = (col*WIDTH, row*HEIGHT)
+        elif symbol == "H":
+            MAZEDATA[self.level]["home"] = (col*WIDTH, row*HEIGHT)
+        elif symbol == "F":
+            MAZEDATA[self.level]["fruit"] = (col*WIDTH, row*HEIGHT)
 
     def setupPortalNodes(self):
         for pos1 in MAZEDATA[self.level]["portal"].keys():
             node1 = self.getNode(*pos1, nodeList=self.nodeList)
-            node2 = self.getNode(*MAZEDATA[self.level]["portal"][pos1], nodeList=self.nodeList)
+            node2 = self.getNode(*MAZEDATA[self.level]["portal"][pos1], 
+                                 nodeList=self.nodeList)
             node1.portalNode = node2
             node2.portalNode = node1
 
@@ -155,13 +158,14 @@ class NodeGroup(object):
         for node in self.homeList:
             node.position -= vec
             node.position += mid
-            #if node.position.toTuple() == MAZEDATA[self.level]["home"]:
-            #    node.home = True
+
         nodeA.neighbors[LEFT] = self.homeList[0]
         nodeB.neighbors[RIGHT] = self.homeList[0]
         self.homeList[0].neighbors[RIGHT] = nodeA
         self.homeList[0].neighbors[LEFT] = nodeB
         self.homeList[0].home = True
+        ghostHome = self.homeList[0].neighbors[DOWN]
+        MAZEDATA["start"]["ghost"] = ghostHome.toTuple()
 
     def checkIfOnRestriction(self, node):
         if node is not None:

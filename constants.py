@@ -31,8 +31,18 @@ MAZEDATA[0]["file"] = "maze1.txt"
 MAZEDATA[0]["portal"] = {(0, 17*HEIGHT):(27*WIDTH, 17*HEIGHT)}
 MAZEDATA[0]["home"] = (15*WIDTH, 14*HEIGHT)
 MAZEDATA[0]["start"] = {"pacman":(15*WIDTH, 26*HEIGHT), "ghost":(216, 272)}
-MAZEDATA[0]["fruit"] = (288, 320)
+MAZEDATA[0]["fruit"] = (18*WIDTH, 20*HEIGHT)
 MAZEDATA[0]["restrictUp"] = {0:(12*WIDTH, 14*HEIGHT),
                              1:(15*WIDTH, 14*HEIGHT),
                              2:(12*WIDTH, 26*HEIGHT),
                              3:(15*WIDTH, 26*HEIGHT)}
+
+MAZEDATA[1] = {}
+MAZEDATA[1]["file"] = "maze2.txt"
+MAZEDATA[1]["portal"] = {(0, 4*HEIGHT):(27*WIDTH, 4*HEIGHT),
+                         (0, 26*HEIGHT:(27*WIDTH,26*HEIGHT)}
+MAZEDATA[1]["home"] = ()
+MAZEDATA[1]["start"] = {"pacman":(), "ghost":()}
+MAZEDATA[1]["fruit"] = ()
+MAZEDATA[1]["restrictUp"] = {}
+        

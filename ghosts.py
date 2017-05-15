@@ -53,8 +53,6 @@ class Ghost(MazeMouse):
     
     def setStartPosition(self):
         self.setHomeNode()
-        #pos = MAZEDATA[self.level]["start"]["ghost"]
-        #self.node = self.nodes.getNode(*pos, nodeList=self.nodes.homeList)
         self.direction = self.startDirection
         self.target = self.node.neighbors[self.direction]
         self.setPosition()
@@ -65,8 +63,6 @@ class Ghost(MazeMouse):
             if self.node.neighbors[key] is not None:
                 if not key == self.direction * -1:
                     validDirections.append(key)
-        if len(validDirections) == 0:
-            validDirections.append(self.forceBacktrack())
 
         if (self.node.home and DOWN in validDirections and
             self.mode.name != "SPAWN"):
@@ -79,6 +75,10 @@ class Ghost(MazeMouse):
                 validDirections = self.guideOutOfHome(validDirections)
             else:
                 validDirections = self.trapInHome(validDirections)
+
+        if len(validDirections) == 0:
+            validDirections.append(self.forceBacktrack())
+
         return validDirections
 
     def trapInHome(self, validDirections):
@@ -136,6 +136,9 @@ class Ghost(MazeMouse):
         if self.direction * -1 == RIGHT:
             return RIGHT
 
+    def reverseGhostDirection(self):
+        if self.leftHome:
+            self.reverseDirection()
 
     def setupModeStack(self):
         modes = Stack()
@@ -156,6 +159,7 @@ class Ghost(MazeMouse):
                 self.modeStack.push(Mode(name=self.mode.name, time=dt))
             else:
                 self.modeStack.push(Mode(name=self.mode.name))
+            self.reverseGhostDirection()
             self.mode = Mode("FREIGHT", time=7, speedMult=0.5)
             self.modeTimer = 0
         elif self.mode.name == "FREIGHT":
@@ -180,9 +184,10 @@ class Ghost(MazeMouse):
         self.modeTimer += dt
         if self.mode.time is not None:
             if self.modeTimer >= self.mode.time:
+                self.reverseGhostDirection()
                 self.mode = self.modeStack.pop()
                 self.modeTimer = 0
-
+        
     def setRespawnMode(self):
         self.mode = Mode("SPAWN", speedMult=2)
         self.modeTimer = 0
@@ -204,7 +209,7 @@ class Blinky(Ghost):
         self.setStartPosition()
         
     def setScatterGoal(self):
-        self.goal = Vector2D(WIDTH*NCOLS, 0)
+        self.goal = Vector2D(WIDTH*(NCOLS-6), 0)
 
     def setHomeNode(self):
         node = self.getStartNode()
