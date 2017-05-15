@@ -40,7 +40,7 @@ MAZEDATA[0]["restrictUp"] = {0:(12*WIDTH, 14*HEIGHT),
 MAZEDATA[1] = {}
 MAZEDATA[1]["file"] = "maze2.txt"
 MAZEDATA[1]["portal"] = {(0, 4*HEIGHT):(27*WIDTH, 4*HEIGHT),
-                         (0, 26*HEIGHT:(27*WIDTH,26*HEIGHT)}
+                         (0, 26*HEIGHT):(27*WIDTH,26*HEIGHT)}
 MAZEDATA[1]["home"] = ()
 MAZEDATA[1]["start"] = {"pacman":(), "ghost":()}
 MAZEDATA[1]["fruit"] = ()

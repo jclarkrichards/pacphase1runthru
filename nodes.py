@@ -165,7 +165,7 @@ class NodeGroup(object):
         self.homeList[0].neighbors[LEFT] = nodeB
         self.homeList[0].home = True
         ghostHome = self.homeList[0].neighbors[DOWN]
-        MAZEDATA["start"]["ghost"] = ghostHome.toTuple()
+        MAZEDATA[self.level]["start"]["ghost"] = ghostHome.position.toTuple()
 
     def checkIfOnRestriction(self, node):
         if node is not None:
