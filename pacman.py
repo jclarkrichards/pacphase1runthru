@@ -11,9 +11,12 @@ class Pacman(MazeMouse):
         self.color = YELLOW
         self.setStartPosition()
         self.r = 4
+        self.image = pygame.image.load("Images/pacman.png").convert()
+        self.pos = (self.position.x, self.position.y, 32, 32)
 
     def update(self, dt):
         self.position += self.direction*self.speed*dt
+        self.pos = (self.position.x, self.position.y, 32, 32)
         direction = self.getValidKey()
         if direction:
             self.moveByKey(direction)
