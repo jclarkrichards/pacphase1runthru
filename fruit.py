@@ -10,6 +10,8 @@ class CollectedFruit(MazeMouse):
         self.chooser(displayedLevel)
         self.setStartPosition()
         self.value = 100
+        self.sheet = pygame.image.load("Images/fruit.png")#.convert()
+        
 
     def setStartPosition(self):
         pos = MAZEDATA[self.level]["fruit"]

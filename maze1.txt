@@ -24,7 +24,7 @@
 0 n p p p p n p p n p p n 0 0 n p p n p p n p p p p n 0
 0 p 0 0 0 0 p 0 0 0 0 0 p 0 0 p 0 0 0 0 0 p 0 0 0 0 p 0
 0 p 0 0 0 0 p 0 0 0 0 0 p 0 0 p 0 0 0 0 0 p 0 0 0 0 p 0
-0 N p n 0 0 n p p n p p n p p M p p n p p n 0 0 n p N 0
+0 N p n 0 0 n p p n p p n - - M p p n p p n 0 0 n p N 0
 0 0 0 p 0 0 p 0 0 p 0 0 0 0 0 0 0 0 p 0 0 p 0 0 p 0 0 0
 0 0 0 p 0 0 p 0 0 p 0 0 0 0 0 0 0 0 p 0 0 p 0 0 p 0 0 0
 0 n p n p p n 0 0 n p p n 0 0 + p p n 0 0 n p p n p n 0

@@ -26,26 +26,17 @@ class GameController(object):
         self.startDelay= False
         self.restartDelay = False
         self.lifeIcons = Lives()
-        #self.imLife = pygame.image.load("Images/pacman.png").convert()
-        #self.imLife.set_colorkey(WHITE)
-        #print self.imLife.get_rect()
 
     def setBackGround(self):
         self.background = pygame.surface.Surface(SCREENSIZE).convert()
         self.background.fill(BLACK)
-        self.nodes = NodeGroup(self.level)
-        self.nodes.render(self.background)
-        self.screen.blit(self.background, (0,0))
-        #self.lifeIcons = Lives()
-        #print "Background"
-        #print self.background.get_size()
-        #pygame.draw.circle(self.background, GREEN, (150, 432), 5)
-        #pygame.draw.circle(self.background, GREEN, (180, 432), 5)
-        #self.screen.blit(self.background, (0, 0))
+        #self.nodes = NodeGroup(self.level)
+        #self.nodes.render(self.background)
+        #self.screen.blit(self.background, (0,0))
 
     def startGame(self):
         self.setBackGround()
-        #self.nodes = NodeGroup(self.level)
+        self.nodes = NodeGroup(self.level)
         self.pellets = PelletGroup(self.level)
         self.pacman = Pacman(self.nodes, self.level)
         self.ghosts = GhostGroup(self.nodes, self.level)
@@ -56,8 +47,6 @@ class GameController(object):
         self.pauseTime = 0
         self.playerPaused = True
         self.startDelay = False
-        #self.nodes.render(self.background)
-        #self.screen.blit(self.background, (0, 0))
 
     def restartLevel(self):
         self.pacman = Pacman(self.nodes, self.level)
@@ -69,15 +58,11 @@ class GameController(object):
         self.pauseTime = 0
         self.playerPaused = True
         self.restartDelay = False
-        #self.nodes.render(self.background)
-        #self.screen.blit(self.background, (0, 0))
 
     def update(self):
         dt = self.clock.tick(30)/1000.0
+        #self.screen.blit(self.background, self.pacman.pos, self.pacman.pos)        
         if not self.paused:
-            #print self.pacman.pos
-            #self.screen.blit(self.background, self.pacman.pos, self.pacman.pos)
-            
             self.pacman.update(dt)
             self.ghosts.update(dt, self.pacman)
             self.checkPelletEvents(dt)
@@ -102,10 +87,8 @@ class GameController(object):
             if event.type == KEYDOWN:
                 if event.key == K_SPACE:
                     if self.paused:
-                        #self.paused = False
                         self.playerPaused = False
                     else:
-                        #self.paused = True
                         self.playerPaused = True
                     self.paused = not self.paused
                     
@@ -198,13 +181,12 @@ class GameController(object):
         
     def render(self):
         self.screen.blit(self.background, (0, 0))
-        #self.nodes.render(self.screen)
         #p = (self.pacman.position.x, self.pacman.position.y, 32, 32)
         #print p
 
         #self.screen.blit(self.pacman.image, self.pacman.pos)
         
-        #self.nodes.render(self.screen)
+        self.nodes.render(self.screen)
         self.pellets.render(self.screen)
         if self.fruit is not None:
             self.fruit.render(self.screen)
@@ -218,15 +200,6 @@ class GameController(object):
         self.ghosts.render(self.screen)
         self.lifeIcons.render(self.screen, self.lives-1)
         
-        #for i in range(self.lives - 1):
-        #    width = self.imLife.get_rect()[2]
-            #y = HEIGHT * (NROWS - 1)
-        #    y = HEIGHT * (NROWS - 2)
-        #    x = 5 + (width + 5)*i
-            #x = 5 + self.pacman.radius + (2*self.pacman.radius + 5)*i
-        #    self.screen.blit(self.imLife, (x, y))
-            #pygame.draw.circle(self.screen, self.pacman.color, (x, y),
-            #                   self.pacman.radius)
         pygame.display.update()
         #pygame.display.update(pacrect)
         
