@@ -12,6 +12,7 @@ class Pacman(MazeMouse):
         self.setStartPosition()
         self.r = 4
         self.image = pygame.image.load("Images/pacman.png").convert()
+        self.image.set_colorkey(TRANSPARENT)
         self.pos = (self.position.x, self.position.y, 32, 32)
 
     def update(self, dt):

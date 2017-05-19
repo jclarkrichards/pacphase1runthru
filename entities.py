@@ -14,7 +14,8 @@ class MazeMouse(object):
         self.radius = 10
         self.color = WHITE
         self.level = level
-        
+        self.image = None
+
     def setPosition(self):
         self.position = self.node.position.copy()
 
@@ -61,4 +62,7 @@ class MazeMouse(object):
     def render(self, screen):
         px = int(self.position.x)
         py = int(self.position.y)
-        pygame.draw.circle(screen, self.color, (px, py), self.radius)
+        if self.image is not None:
+            screen.blit(self.image, (px, py))
+        else:
+            pygame.draw.circle(screen, self.color, (px, py), self.radius)

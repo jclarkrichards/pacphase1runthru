@@ -3,8 +3,8 @@ from constants import *
 
 class Lives(object):
     def __init__(self):
-        self.image = pygame.image.load("Images/pacmanTest.png").convert()
-        self.image.set_colorkey((255,0,255))
+        self.image = pygame.image.load("Images/pacman.png").convert()
+        self.image.set_colorkey(TRANSPARENT)
         self.width, self.height = self.image.get_size()
         self.gap = 10
 

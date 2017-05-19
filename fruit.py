@@ -3,14 +3,15 @@ from entities import MazeMouse
 from constants import *
 
 class CollectedFruit(MazeMouse):
-    def __init__(self, nodes, level, displayedLevel):
+    def __init__(self, nodes, level, displayedLevel, sheet):
         MazeMouse.__init__(self, nodes, level)
         self.name = "fruit"
+        self.sheet = sheet
+        self.width, self.height = 32, 32
         self.color = (0, 200, 0)
         self.chooser(displayedLevel)
         self.setStartPosition()
         self.value = 100
-        self.sheet = pygame.image.load("Images/fruit.png")#.convert()
         
 
     def setStartPosition(self):
@@ -27,16 +28,19 @@ class CollectedFruit(MazeMouse):
             self.name = "cherry"
             self.color = RED
             self.value = 100
-            
+            self.image = self.sheet.getImage(64, 0, self.width, self.height)
+
         elif level == 1:
             self.name = "banana"
             self.color = YELLOW
             self.value = 200
+            self.image = self.sheet.getImage(32, 0, self.width, self.height)
             
         elif level == 2:
             self.name = "apple"
             self.color = MAROON
             self.value = 500
+            self.image = self.sheet.getImage(0, 0, self.width, self.height)
             
         elif level == 3:
             self.name = "watermelon"

@@ -7,6 +7,7 @@ from ghosts import GhostGroup
 from pellets import PelletGroup
 from fruit import CollectedFruit, DisplayedFruit
 from lifeicons import Lives
+from spritesheet import SpriteSheet
 
 class GameController(object):
     def __init__(self):
@@ -26,6 +27,8 @@ class GameController(object):
         self.startDelay= False
         self.restartDelay = False
         self.lifeIcons = Lives()
+
+        self.sheet = SpriteSheet()
 
     def setBackGround(self):
         self.background = pygame.surface.Surface(SCREENSIZE).convert()
@@ -117,7 +120,7 @@ class GameController(object):
             if (self.pellets.numEaten == 70 or
                 self.pellets.numEaten == 140):
                 self.fruit = CollectedFruit(self.nodes, self.level,
-                                            self.displayedLevel)
+                                            self.displayedLevel, self.sheet)
 
         else:
             self.idleTimer += dt
