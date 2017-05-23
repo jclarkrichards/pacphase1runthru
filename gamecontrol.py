@@ -18,6 +18,9 @@ class GameController(object):
         self.clock = pygame.time.Clock()
         self.level = 0
         self.score = 0
+        self.scoreAccumulator = 0
+        self.maxLives = 5
+        self.newLifePoints = 10000
         self.ghostScore = 200
         self.lives = 5
         self.idleTimer = 0
@@ -26,9 +29,9 @@ class GameController(object):
         self.maxLevels = 2
         self.startDelay= False
         self.restartDelay = False
-        self.lifeIcons = Lives()
-
+        #self.lifeIcons = Lives()
         self.sheet = SpriteSheet()
+        self.lifeIcons = Lives(self.sheet)
 
     def setBackGround(self):
         self.background = pygame.surface.Surface(SCREENSIZE).convert()
@@ -41,8 +44,8 @@ class GameController(object):
         self.setBackGround()
         self.nodes = NodeGroup(self.level)
         self.pellets = PelletGroup(self.level)
-        self.pacman = Pacman(self.nodes, self.level)
-        self.ghosts = GhostGroup(self.nodes, self.level)
+        self.pacman = Pacman(self.nodes, self.level, self.sheet)
+        self.ghosts = GhostGroup(self.nodes, self.level, self.sheet)
         self.fruit = None
         self.fruitTimer = 0
         self.paused = True
@@ -50,10 +53,11 @@ class GameController(object):
         self.pauseTime = 0
         self.playerPaused = True
         self.startDelay = False
-
+        self.scoreAccumulator = 0
+        
     def restartLevel(self):
-        self.pacman = Pacman(self.nodes, self.level)
-        self.ghosts = GhostGroup(self.nodes, self.level)
+        self.pacman = Pacman(self.nodes, self.level, self.sheet)
+        self.ghosts = GhostGroup(self.nodes, self.level, self.sheet)
         self.paused = True
         self.fruit =None
         self.fruitTimer = 0
@@ -61,7 +65,8 @@ class GameController(object):
         self.pauseTime = 0
         self.playerPaused = True
         self.restartDelay = False
-
+        self.scoreAccumulator = 0
+        
     def update(self):
         dt = self.clock.tick(30)/1000.0
         #self.screen.blit(self.background, self.pacman.pos, self.pacman.pos)        
@@ -71,6 +76,7 @@ class GameController(object):
             self.checkPelletEvents(dt)
             self.checkGhostEvents(dt)
             self.checkFruitEvents(dt)
+            self.applyScore()
         else:
             if not self.playerPaused:
                 self.pauseTimer += dt
@@ -101,7 +107,8 @@ class GameController(object):
             #print self.pellets.numEaten
             self.pellets.numEaten += 1
             self.idleTimer = 0
-            self.score += pellet.value
+            self.scoreAccumulator += pellet.value
+            #self.score += pellet.value
             self.pellets.pelletList.remove(pellet)
             if pellet.name == "powerpellet":
                 self.ghostScore = 200
@@ -134,7 +141,8 @@ class GameController(object):
         ghost = self.pacman.eatGhost(self.ghosts)
         if ghost is not None:
             if ghost.mode.name == "FREIGHT":
-                self.score += self.ghostScore
+                #self.score += self.ghostScore
+                self.scoreAccumulator += self.ghostScore
                 self.ghostScore *= 2
                 ghost.setRespawnMode()
                 self.paused = True
@@ -160,7 +168,8 @@ class GameController(object):
     def checkFruitEvents(self, dt):
         if self.fruit is not None:
             if self.pacman.eatFruit(self.fruit):
-                self.score += self.fruit.value
+                #self.score += self.fruit.value
+                self.scoreAccumulator += self.fruit.value
                 self.addDisplayedFruit()
                 self.fruitTimer = 0
                 self.fruit = None
@@ -181,7 +190,21 @@ class GameController(object):
         self.level += 1
         self.displayedLevel += 1
         self.level %= self.maxLevels
+
+    def applyScore(self):
+        newScore = self.score + self.scoreAccumulator
+
+        if ((newScore % 10000 - self.score % 10000) < 0 or
+            newScore - self.score >= 10000):
+            if self.lives < self.maxLives:
+                self.lives += 1
+            #print "New life gained!"
+            #print self.score, newScore
+            #print ""
+        self.score += self.scoreAccumulator
+        self.scoreAccumulator = 0
         
+    
     def render(self):
         self.screen.blit(self.background, (0, 0))
         #p = (self.pacman.position.x, self.pacman.position.y, 32, 32)

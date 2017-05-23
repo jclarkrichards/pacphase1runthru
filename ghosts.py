@@ -201,12 +201,13 @@ class Ghost(MazeMouse):
         
 
 class Blinky(Ghost):
-    def __init__(self, nodes, level):
+    def __init__(self, nodes, level, spritesheet):
         Ghost.__init__(self, nodes, level)
         self.name = "blinky"
         self.color = RED
         self.startDirection = LEFT
         self.setStartPosition()
+        self.image = spritesheet.getImage(0, 2, 32, 32)
         
     def setScatterGoal(self):
         self.goal = Vector2D(WIDTH*(NCOLS-6), 0)
@@ -217,11 +218,12 @@ class Blinky(Ghost):
         self.node = self.homeNode.neighbors[UP]
 
 class Pinky(Ghost):
-    def __init__(self, nodes, level):
+    def __init__(self, nodes, level, spritesheet):
         Ghost.__init__(self, nodes, level)
         self.name = "pinky"
         self.color = PINK
         self.setStartPosition()
+        self.image = spritesheet.getImage(0, 3, 32, 32)
         
     def setChaseGoal(self, pacman, blinky=None):
         self.goal = pacman.position + pacman.direction * WIDTH * 4
@@ -235,7 +237,7 @@ class Pinky(Ghost):
         self.node = node
 
 class Inky(Ghost):
-    def __init__(self, nodes, level):
+    def __init__(self, nodes, level, spritesheet):
         Ghost.__init__(self, nodes, level)
         self.name = "inky"
         self.color = TEAL
@@ -244,6 +246,7 @@ class Inky(Ghost):
         self.exitHome = False
         self.setGuideStack()
         self.leftHome = False
+        self.image = spritesheet.getImage(0, 4, 32, 32)
         
     def setChaseGoal(self, pacman, blinky=None):
         vec1 = pacman.position + pacman.direction * WIDTH * 2
@@ -266,7 +269,7 @@ class Inky(Ghost):
 
         
 class Clyde(Ghost):
-    def __init__(self, nodes, level):
+    def __init__(self, nodes, level, spritesheet):
         Ghost.__init__(self, nodes, level)
         self.name = "clyde"
         self.color = ORANGE
@@ -275,6 +278,7 @@ class Clyde(Ghost):
         self.exitHome = False
         self.setGuideStack()
         self.leftHome = False
+        self.image = spritesheet.getImage(0, 5, 32, 32)
         
     def setChaseGoal(self, pacman, blinky=None):
         d = pacman.position - self.position
@@ -300,15 +304,15 @@ class Clyde(Ghost):
         
         
 class GhostGroup(object):
-    def __init__(self, nodes, level):
+    def __init__(self, nodes, level, spritesheet):
         self.nodes = nodes
         self.level = level
         self.ghosts = []
         self.ghosts = []
-        self.ghosts.append(Blinky(nodes, level))
-        self.ghosts.append(Pinky(nodes, level))
-        self.ghosts.append(Inky(nodes, level))
-        self.ghosts.append(Clyde(nodes, level))
+        self.ghosts.append(Blinky(nodes, level, spritesheet))
+        self.ghosts.append(Pinky(nodes, level, spritesheet))
+        self.ghosts.append(Inky(nodes, level, spritesheet))
+        self.ghosts.append(Clyde(nodes, level, spritesheet))
 
     def __iter__(self):
         return iter(self.ghosts)

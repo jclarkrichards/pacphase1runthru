@@ -8,6 +8,10 @@ class SpriteSheet(object):
         self.images = {}
 
     def getImage(self, x, y, width, height):
+        x *= width
+        y *= height
+#        print x, y
+#        print ""
         self.sheet.set_clip(pygame.Rect(x, y, width, height))
         return self.sheet.subsurface(self.sheet.get_clip())
 

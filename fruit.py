@@ -23,34 +23,40 @@ class CollectedFruit(MazeMouse):
         self.position.x -= halfway
 
     def chooser(self, level):
-        level %= 5
+        level %= 6
         if level == 0:
             self.name = "cherry"
             self.color = RED
             self.value = 100
-            self.image = self.sheet.getImage(64, 0, self.width, self.height)
+            self.image = self.sheet.getImage(8, 2, self.width, self.height)
 
         elif level == 1:
             self.name = "banana"
             self.color = YELLOW
             self.value = 200
-            self.image = self.sheet.getImage(32, 0, self.width, self.height)
+            self.image = self.sheet.getImage(9, 2, self.width, self.height)
             
         elif level == 2:
             self.name = "apple"
             self.color = MAROON
             self.value = 500
-            self.image = self.sheet.getImage(0, 0, self.width, self.height)
+            self.image = self.sheet.getImage(10, 2, self.width, self.height)
             
         elif level == 3:
-            self.name = "watermelon"
-            self.color = GREEN
-            self.value = 1000
+            self.name = "strawberry"
+            self.color = MAROON
+            self.value = 700
             
         elif level == 4:
-            self.name = "lemon"
-            self.color = LIGHTYELLOW
+            self.name = "orange"
+            self.color = ORANGE
             self.value = 1500
+            
+        elif level == 5:
+            self.name = "watermelon"
+            self.color = GREEN
+            self.value = 2000
+            
 
 class DisplayedFruit(object):
     def __init__(self, fruit):

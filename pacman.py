@@ -5,16 +5,19 @@ from constants import *
 from entities import MazeMouse
 
 class Pacman(MazeMouse):
-    def __init__(self, nodes, level):
+    def __init__(self, nodes, level, spritesheet):
         MazeMouse.__init__(self, nodes, level)
         self.name = "pacman"
         self.color = YELLOW
         self.setStartPosition()
         self.r = 4
-        self.image = pygame.image.load("Images/pacman.png").convert()
-        self.image.set_colorkey(TRANSPARENT)
+        #self.image = pygame.image.load("Images/pacman.png").convert()
+        #self.image.set_colorkey(TRANSPARENT)
+        self.spritesheet = spritesheet
+        self.image = self.spritesheet.getImage(0, 0, 32, 32)
         self.pos = (self.position.x, self.position.y, 32, 32)
-
+        self.previousDirection = self.direction
+        
     def update(self, dt):
         self.position += self.direction*self.speed*dt
         self.pos = (self.position.x, self.position.y, 32, 32)
@@ -24,9 +27,27 @@ class Pacman(MazeMouse):
         else:
             self.moveBySelf()
 
+        self.checkDirectionChange()
 
+    def checkDirectionChange(self):
+#        if self.direction != self.previousDirection:
+#            self.previousDirection = self.direction
+        if self.direction == LEFT:
+            self.image = self.spritesheet.getImage(0, 0, 32, 32)
+
+        elif self.direction == RIGHT:
+            self.image = self.spritesheet.getImage(1, 0, 32, 32)
+
+        elif self.direction == DOWN:
+            self.image = self.spritesheet.getImage(2, 0, 32, 32)
+
+        elif self.direction == UP:
+            self.image = self.spritesheet.getImage(3, 0, 32, 32)
+
+            
     def setStartPosition(self):
         self.direction = LEFT
+        
         pos = MAZEDATA[self.level]["start"]["pacman"]
         self.node = self.nodes.getNode(*pos, nodeList=self.nodes.nodeList)
         self.target = self.node.neighbors[self.direction]
