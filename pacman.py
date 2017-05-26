@@ -9,12 +9,15 @@ class Pacman(MazeMouse):
         MazeMouse.__init__(self, nodes, level)
         self.name = "pacman"
         self.color = YELLOW
+        self.imageRow = 0
+        self.imageCol = 0
+        self.animateFrame = 0
         self.setStartPosition()
         self.r = 4
         #self.image = pygame.image.load("Images/pacman.png").convert()
         #self.image.set_colorkey(TRANSPARENT)
         self.spritesheet = spritesheet
-        self.image = self.spritesheet.getImage(0, 0, 32, 32)
+        self.image = self.spritesheet.getImage(4, 0, 32, 32)
         self.pos = (self.position.x, self.position.y, 32, 32)
         self.previousDirection = self.direction
         
@@ -28,22 +31,39 @@ class Pacman(MazeMouse):
             self.moveBySelf()
 
         self.checkDirectionChange()
+        if self.direction != STOP:
+            row, col = self.animate()
+            self.animateFrame += 1
+            if self.animateFrame > 5:
+                self.animateFrame = 0
+            self.setImage(row, col)
+        else:
+            self.setImage(0, 4)
+        #print str(row)+", " + str(col)
+
+    def animate(self):
+        row = self.imageRow
+        col = self.imageCol
+        rowSequence = [0, 0, 1, 0, 1, 0]
+        colSequence = [4] + [self.imageCol] * 5
+        
+        return rowSequence[self.animateFrame], colSequence[self.animateFrame]
 
     def checkDirectionChange(self):
-#        if self.direction != self.previousDirection:
-#            self.previousDirection = self.direction
-        if self.direction == LEFT:
-            self.image = self.spritesheet.getImage(0, 0, 32, 32)
+        if self.direction != self.previousDirection:
+            self.previousDirection = self.direction
 
-        elif self.direction == RIGHT:
-            self.image = self.spritesheet.getImage(1, 0, 32, 32)
+            if self.direction == LEFT:
+                self.imageCol = 0
+            elif self.direction == RIGHT:
+                self.imageCol = 1
+            elif self.direction == DOWN:
+                self.imageCol = 2
+            elif self.direction == UP:
+                self.imageCol = 3
 
-        elif self.direction == DOWN:
-            self.image = self.spritesheet.getImage(2, 0, 32, 32)
-
-        elif self.direction == UP:
-            self.image = self.spritesheet.getImage(3, 0, 32, 32)
-
+    def setImage(self, row, col):
+        self.image = self.spritesheet.getImage(col, row, 32, 32)   
             
     def setStartPosition(self):
         self.direction = LEFT

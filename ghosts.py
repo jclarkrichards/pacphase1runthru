@@ -13,9 +13,10 @@ class Mode(object):
 
         
 class Ghost(MazeMouse):
-    def __init__(self, nodes, level):
+    def __init__(self, nodes, level, spritesheet):
         MazeMouse.__init__(self, nodes, level)
         self.name = "ghost"
+        self.spritesheet = spritesheet
         self.goal = Vector2D()
         self.modeStack = self.setupModeStack()
         self.mode = self.modeStack.pop()
@@ -26,7 +27,8 @@ class Ghost(MazeMouse):
         self.exitHome = True
         self.guideDog = False
         self.leftHome = True
-        
+        self.previousDirection = None
+
     def getStartNode(self):
         node = MAZEDATA[self.level]["start"]["ghost"]
         return self.nodes.getNode(*node, nodeList=self.nodes.homeList)
@@ -44,7 +46,47 @@ class Ghost(MazeMouse):
         elif self.mode.name == "SPAWN":
             self.setSpawnGoal()
         self.moveBySelf()
+        self.checkDirectionChange()
 
+
+    def checkDirectionChange(self):
+        if self.direction != self.previousDirection:
+            self.previousDirection = self.direction
+            row = self.imageRow
+            col = 0
+            if self.mode.name == "SPAWN":
+                row, col = self.setSpawnImages()
+                
+            elif self.mode.name == "FREIGHT":
+                row = 6
+                col = 0
+            else:
+                if self.direction == LEFT:
+                    col = 4
+                elif self.direction == RIGHT:
+                    col = 6
+                elif self.direction == DOWN:
+                    col = 2
+                elif self.direction == UP:
+                    col = 0
+                
+            self.setImage(row, col)
+
+    def setSpawnImages(self):
+        row = 6
+        if self.direction == LEFT:
+            col = 6
+        elif self.direction == RIGHT:
+            col = 7
+        elif self.direction == UP:
+            col = 4
+        elif self.direction == DOWN:
+            col = 5
+        return row, col
+
+    def setImage(self, row, col):
+        self.image = self.spritesheet.getImage(col, row, 32, 32)
+        
     def modifySpeed(self):
         if (self.node.portalNode is not None or
             self.target.portalNode is not None):
@@ -56,7 +98,8 @@ class Ghost(MazeMouse):
         self.direction = self.startDirection
         self.target = self.node.neighbors[self.direction]
         self.setPosition()
-    
+        self.checkDirectionChange()
+
     def getValidDirections(self):
         validDirections = []
         for key in self.node.neighbors.keys():
@@ -193,7 +236,9 @@ class Ghost(MazeMouse):
         self.modeTimer = 0
         self.setGuideStack()
         self.leftHome = False
-        
+        row, col = self.setSpawnImages()
+        self.setImage(row, col)
+
     def setGuideStack(self):
         self.guideStack = Stack()
         self.guideStack.push(LEFT)
@@ -202,13 +247,14 @@ class Ghost(MazeMouse):
 
 class Blinky(Ghost):
     def __init__(self, nodes, level, spritesheet):
-        Ghost.__init__(self, nodes, level)
+        Ghost.__init__(self, nodes, level, spritesheet)
         self.name = "blinky"
         self.color = RED
         self.startDirection = LEFT
+        self.imageRow = 2
+        self.imageCol = 0
         self.setStartPosition()
-        self.image = spritesheet.getImage(0, 2, 32, 32)
-        
+
     def setScatterGoal(self):
         self.goal = Vector2D(WIDTH*(NCOLS-6), 0)
 
@@ -219,12 +265,13 @@ class Blinky(Ghost):
 
 class Pinky(Ghost):
     def __init__(self, nodes, level, spritesheet):
-        Ghost.__init__(self, nodes, level)
+        Ghost.__init__(self, nodes, level, spritesheet)
         self.name = "pinky"
         self.color = PINK
+        self.imageRow = 3
+        self.imageCol = 0
         self.setStartPosition()
-        self.image = spritesheet.getImage(0, 3, 32, 32)
-        
+
     def setChaseGoal(self, pacman, blinky=None):
         self.goal = pacman.position + pacman.direction * WIDTH * 4
         
@@ -238,16 +285,17 @@ class Pinky(Ghost):
 
 class Inky(Ghost):
     def __init__(self, nodes, level, spritesheet):
-        Ghost.__init__(self, nodes, level)
+        Ghost.__init__(self, nodes, level, spritesheet)
         self.name = "inky"
         self.color = TEAL
         self.startDirection = DOWN
+        self.imageRow = 4
+        self.imageCol = 0
         self.setStartPosition()
         self.exitHome = False
         self.setGuideStack()
         self.leftHome = False
-        self.image = spritesheet.getImage(0, 4, 32, 32)
-        
+
     def setChaseGoal(self, pacman, blinky=None):
         vec1 = pacman.position + pacman.direction * WIDTH * 2
         vec2 = (vec1 - blinky.position) * 2
@@ -270,16 +318,17 @@ class Inky(Ghost):
         
 class Clyde(Ghost):
     def __init__(self, nodes, level, spritesheet):
-        Ghost.__init__(self, nodes, level)
+        Ghost.__init__(self, nodes, level, spritesheet)
         self.name = "clyde"
         self.color = ORANGE
         self.startDirection = DOWN
+        self.imageRow = 5
+        self.imageCol = 0
         self.setStartPosition()
         self.exitHome = False
         self.setGuideStack()
         self.leftHome = False
-        self.image = spritesheet.getImage(0, 5, 32, 32)
-        
+
     def setChaseGoal(self, pacman, blinky=None):
         d = pacman.position - self.position
         ds = d.magnitudeSquared()
