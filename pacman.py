@@ -3,67 +3,93 @@ from pygame.locals import *
 from vectors import Vector2D
 from constants import *
 from entities import MazeMouse
+from animation import Animation
+from animation import LinkedAnimation
 
 class Pacman(MazeMouse):
     def __init__(self, nodes, level, spritesheet):
         MazeMouse.__init__(self, nodes, level)
         self.name = "pacman"
         self.color = YELLOW
-        self.imageRow = 0
-        self.imageCol = 0
-        self.animateFrame = 0
+        #self.imageRow = 0
+        #self.imageCol = 0
+        #self.animateFrame = 0
         self.setStartPosition()
         self.r = 4
         #self.image = pygame.image.load("Images/pacman.png").convert()
         #self.image.set_colorkey(TRANSPARENT)
         self.spritesheet = spritesheet
-        self.image = self.spritesheet.getImage(4, 0, 32, 32)
+        #self.image = self.spritesheet.getImage(4, 0, 32, 32)
         self.pos = (self.position.x, self.position.y, 32, 32)
         self.previousDirection = self.direction
-        
+        self.animateName = "left"
+        #print self.direction
+        self.animate = LinkedAnimation()
+        self.defineAnimations()
+        self.animate.setAnimation("left", 0)
+        self.image = self.animate.getImage(0)
+        self.alive = True
+        self.deathSequenceFinished = False
+
     def update(self, dt):
-        self.position += self.direction*self.speed*dt
-        self.pos = (self.position.x, self.position.y, 32, 32)
-        direction = self.getValidKey()
-        if direction:
-            self.moveByKey(direction)
-        else:
-            self.moveBySelf()
+        if self.alive:
+            self.position += self.direction*self.speed*dt
+            self.pos = (self.position.x, self.position.y, 32, 32)
+            direction = self.getValidKey()
 
-        self.checkDirectionChange()
-        if self.direction != STOP:
-            row, col = self.animate()
-            self.animateFrame += 1
-            if self.animateFrame > 5:
-                self.animateFrame = 0
-            self.setImage(row, col)
-        else:
-            self.setImage(0, 4)
-        #print str(row)+", " + str(col)
+            if direction:
+                self.moveByKey(direction)
+            else:
+                self.moveBySelf()
 
-    def animate(self):
-        row = self.imageRow
-        col = self.imageCol
-        rowSequence = [0, 0, 1, 0, 1, 0]
-        colSequence = [4] + [self.imageCol] * 5
+            self.checkDirectionChange()
         
-        return rowSequence[self.animateFrame], colSequence[self.animateFrame]
+            if self.direction != STOP:
+                self.image = self.animate.ping(dt)
+                #print self.animate.animation.col
+                #row, col = self.animate()
+                #self.animateFrame += 1
+                #if self.animateFrame > 5:
+                #    self.animateFrame = 0
+                #self.setImage(row, col)
+            else:
+                self.image = self.animate.getImage(0)
+                #self.setImage(0, 4)
+        else:
+            self.image = self.animate.onePass(dt)
+            if self.animate.animation.finished:
+                self.deathSequenceFinished = True
+            
+        
+    #def animate(self):
+    #    row = self.imageRow
+    #    col = self.imageCol
+    #    rowSequence = [0, 0, 1, 0, 1, 0]
+    #    colSequence = [4] + [self.imageCol] * 5
+        
+    #    return rowSequence[self.animateFrame], colSequence[self.animateFrame]
 
     def checkDirectionChange(self):
         if self.direction != self.previousDirection:
             self.previousDirection = self.direction
-
+            #name = ""
             if self.direction == LEFT:
-                self.imageCol = 0
+                print "left"
+                self.animateName = "left"
+                #self.imageCol = 0
             elif self.direction == RIGHT:
-                self.imageCol = 1
+                self.animateName = "right"
+                #self.imageCol = 1
             elif self.direction == DOWN:
-                self.imageCol = 2
+                self.animateName = "down"
+                #self.imageCol = 2
             elif self.direction == UP:
-                self.imageCol = 3
-
-    def setImage(self, row, col):
-        self.image = self.spritesheet.getImage(col, row, 32, 32)   
+                self.animateName = "up"
+                #self.imageCol = 3
+            self.animate.setAnimation(self.animateName, self.animate.animation.col)
+            
+    #def setImage(self, row, col):
+    #    self.image = self.spritesheet.getImage(col, row, 32, 32)   
             
     def setStartPosition(self):
         self.direction = LEFT
@@ -143,3 +169,51 @@ class Pacman(MazeMouse):
 
     def reduceSpeed(self):
         self.speed = MAXSPEED * 0.8
+
+    def defineAnimations(self):
+        anim = Animation("left")
+        anim.speed = 20
+        anim.addFrame(self.spritesheet.getImage(9, 0, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(5, 0, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(5, 1, 32, 32))
+        self.animate.add(anim)
+
+        anim = Animation("right")
+        anim.speed = 20
+        anim.addFrame(self.spritesheet.getImage(4, 0, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(1, 0, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(1, 1, 32, 32))
+        self.animate.add(anim)
+
+        anim = Animation("down")
+        anim.speed = 20
+        anim.addFrame(self.spritesheet.getImage(4, 0, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(2, 0, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(2, 1, 32, 32))
+        self.animate.add(anim)
+
+        anim = Animation("up")
+        anim.speed = 20
+        anim.addFrame(self.spritesheet.getImage(4, 0, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(3, 0, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(3, 1, 32, 32))
+        self.animate.add(anim)
+
+        anim = Animation("death")
+        anim.speed = 10
+        anim.addFrame(self.spritesheet.getImage(0, 7, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(1, 7, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(2, 7, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(3, 7, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(4, 7, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(5, 7, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(6, 7, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(7, 7, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(8, 7, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(9, 7, 32, 32))
+        anim.addFrame(self.spritesheet.getImage(10, 7, 32, 32))
+        anim.startDelay = 1
+        anim.endDelay = 2
+        self.animate.add(anim)
+        
+

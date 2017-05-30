@@ -32,6 +32,7 @@ class GameController(object):
         #self.lifeIcons = Lives()
         self.sheet = SpriteSheet()
         self.lifeIcons = Lives(self.sheet)
+        #self.lostLife = False
 
     def setBackGround(self):
         self.background = pygame.surface.Surface(SCREENSIZE).convert()
@@ -79,13 +80,19 @@ class GameController(object):
             self.applyScore()
         else:
             if not self.playerPaused:
-                self.pauseTimer += dt
-                if self.pauseTimer >= self.pauseTime:
-                    self.paused = False
-                    if self.startDelay == True:
-                        self.startGame()
-                    if self.restartDelay == True:
+                if not self.pacman.alive:
+                    self.pacman.alive = False
+                    self.pacman.update(dt)
+                    if self.pacman.deathSequenceFinished:
                         self.restartLevel()
+                else:
+                    self.pauseTimer += dt
+                    if self.pauseTimer >= self.pauseTime:
+                        self.paused = False
+                        if self.startDelay == True:
+                            self.startGame()
+                        if self.restartDelay == True:
+                            self.restartLevel()
         self.checkEvents()
         self.render()
 
@@ -150,14 +157,17 @@ class GameController(object):
                 self.pauseTimer = 0
             elif ghost.mode.name != "SPAWN":
                 self.paused = True
-                self.pauseTime = 1
-                self.pauseTimer = 0
+                #self.lostLife = True
+                #self.pauseTime = 1
+                #self.pauseTimer = 0
                 self.restartDelay = True
                 self.lives -= 1
-                if self.lives == 0:
-                    self.level = 0
-                    self.lives = 5
-                    self.startGame()
+                self.pacman.alive = False
+                self.pacman.animate.setAnimation("death", 0)
+                #if self.lives == 0:
+                #    self.level = 0
+                #    self.lives = 5
+                #    self.startGame()
 
 
         if self.pellets.numEaten >= 30 or self.idleTimer >= 10:
@@ -223,7 +233,8 @@ class GameController(object):
         #self.screen.blit(self.background, p, p)
         #self.screen.blit(self.pacman.image, p)
         self.pacman.render(self.screen)
-        self.ghosts.render(self.screen)
+        if self.pacman.alive:
+            self.ghosts.render(self.screen)
         self.lifeIcons.render(self.screen, self.lives-1)
         
         pygame.display.update()
