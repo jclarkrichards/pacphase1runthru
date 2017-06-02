@@ -8,13 +8,13 @@ from pellets import PelletGroup
 from fruit import CollectedFruit, DisplayedFruit
 from lifeicons import Lives
 from spritesheet import SpriteSheet
+from maze import Maze
 
 class GameController(object):
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode(SCREENSIZE, 0, 32)
         self.background = None
-        #self.setBackGround()
         self.clock = pygame.time.Clock()
         self.level = 0
         self.score = 0
@@ -29,20 +29,17 @@ class GameController(object):
         self.maxLevels = 2
         self.startDelay= False
         self.restartDelay = False
-        #self.lifeIcons = Lives()
         self.sheet = SpriteSheet()
         self.lifeIcons = Lives(self.sheet)
-        #self.lostLife = False
 
     def setBackGround(self):
         self.background = pygame.surface.Surface(SCREENSIZE).convert()
         self.background.fill(BLACK)
-        #self.nodes = NodeGroup(self.level)
-        #self.nodes.render(self.background)
-        #self.screen.blit(self.background, (0,0))
 
     def startGame(self):
         self.setBackGround()
+        self.maze = Maze(self.level, self.sheet)
+        self.maze.fillMaze(self.background)
         self.nodes = NodeGroup(self.level)
         self.pellets = PelletGroup(self.level)
         self.pacman = Pacman(self.nodes, self.level, self.sheet)
@@ -81,7 +78,7 @@ class GameController(object):
         else:
             if not self.playerPaused:
                 if not self.pacman.alive:
-                    self.pacman.alive = False
+                    #self.pacman.alive = False
                     self.pacman.update(dt)
                     if self.pacman.deathSequenceFinished:
                         self.restartLevel()
@@ -222,7 +219,7 @@ class GameController(object):
 
         #self.screen.blit(self.pacman.image, self.pacman.pos)
         
-        self.nodes.render(self.screen)
+        #self.nodes.render(self.screen)
         self.pellets.render(self.screen)
         if self.fruit is not None:
             self.fruit.render(self.screen)

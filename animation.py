@@ -8,10 +8,6 @@ class Animation(object):
         self.speed = 0
         self.dt = 0
         self.finished = False
-        self.startDelay = 0  #seconds before starting
-        self.endDelay = 0  #seconds after ending
-        self.startDelayFinished = False
-        self.endDelayFinished = False
 
     def addFrame(self, frame):
         self.frames.append(frame)
@@ -33,12 +29,10 @@ class Animation(object):
         if self.forward:
             if self.col == len(self.frames):
                 self.col = len(self.frames) - 1
-                #self.updateEndDelay(self.dt)
                 self.finished = True
         else:
             if self.col == -1:
                 self.col = 0
-                #self.updateEndDelay(self.dt)
                 self.finished = True
 
     def ping(self, dt):
@@ -52,31 +46,15 @@ class Animation(object):
             
     def nextFrame(self, dt):
         self.dt += dt
-        if self.startDelay > 0 and not self.startDelayFinished:
-            self.updateStartDelay(self.dt)
-        else:
-            if self.dt >= 1.0/self.speed:
-                if self.forward:
-                    self.col += 1
-                else:
-                    self.col -= 1
-                self.dt = 0
-
-    def updateStartDelay(self, dt):
-        if self.dt >= self.startDelay:
+        if self.dt >= 1.0/self.speed:
+            if self.forward:
+                self.col += 1
+            else:
+                self.col -= 1
             self.dt = 0
-            self.startDelayFinished = True
 
 
-    def updateEndDelay(self, dt):
-        if self.endDelay > 0 and not self.endDelayFinished:
-            if dt >= self.endDelay:
-                self.endDelayFinished = True
-                self.finished = True
-                self.dt = 0
-
-
-class LinkedAnimation(object):
+class AnimationGroup(object):
     def __init__(self):
         '''Handles linked animations sets.  All sets must have same 
         number of frames'''

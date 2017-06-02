@@ -12,8 +12,8 @@ class Pellet(object):
         self.value = 10
         
     def render(self, screen):
-        px = int(self.position.x)
-        py = int(self.position.y)
+        px = int(self.position.x + 8)
+        py = int(self.position.y + 8)
         pygame.draw.circle(screen, self.color, (px, py), self.radius)
 
 

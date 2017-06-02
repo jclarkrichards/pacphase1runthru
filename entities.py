@@ -60,8 +60,8 @@ class MazeMouse(object):
             self.setPosition()
 
     def render(self, screen):
-        px = int(self.position.x)
-        py = int(self.position.y)
+        px = int(self.position.x - 8)
+        py = int(self.position.y - 8)
         if self.image is not None:
             screen.blit(self.image, (px, py))
         else:

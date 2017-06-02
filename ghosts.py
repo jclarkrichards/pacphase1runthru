@@ -263,6 +263,12 @@ class Blinky(Ghost):
         self.homeNode = node
         self.node = self.homeNode.neighbors[UP]
 
+    def defineAnimations(self):
+        anim = Animation("left")
+        anim.speed = 10
+        anim.addFrame(self.spritesheet.getImage(2, 0, 32, 32))
+        self.animate.add(anim)
+
 class Pinky(Ghost):
     def __init__(self, nodes, level, spritesheet):
         Ghost.__init__(self, nodes, level, spritesheet)

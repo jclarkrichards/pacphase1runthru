@@ -63,12 +63,18 @@ class DisplayedFruit(object):
         self.name = fruit.name
         self.color = fruit.color
         self.radius = fruit.radius
+        self.image = fruit.image
+        self.width = fruit.width
 
     def setPosition(self, index):
-        x = WIDTH*NCOLS - (5 + self.radius + (2*self.radius + 5) * index)
-        y = HEIGHT*(NROWS - 1)
+        x = WIDTH*NCOLS - (5 + self.width) * (index + 1)
+        y = HEIGHT*(NROWS - 2)
         self.position = Vector2D(x, y)
 
     def render(self, screen):
-        x, y = self.position.toTuple()
-        pygame.draw.circle(screen, self.color, (x, y), self.radius)
+        x = int(self.position.x)
+        y = int(self.position.y)
+        if self.image is None:
+            pygame.draw.circle(screen, self.color, (x, y), self.radius)
+        else:
+            screen.blit(self.image, (x, y))
