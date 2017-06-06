@@ -9,6 +9,7 @@ from fruit import CollectedFruit, DisplayedFruit
 from lifeicons import Lives
 from spritesheet import SpriteSheet
 from maze import Maze
+from text2 import TextGroup
 
 class GameController(object):
     def __init__(self):
@@ -31,6 +32,14 @@ class GameController(object):
         self.restartDelay = False
         self.sheet = SpriteSheet()
         self.lifeIcons = Lives(self.sheet)
+
+        self.allText = TextGroup()
+        self.allText.add("hi_score_label", "HI SCORE", align="left")
+        self.allText.add("score_label", "SCORE", align="center")
+        self.allText.add("level_label", "LEVEL", align="right")
+        self.allText.add("start_label", "START", y=20*HEIGHT, align="center", color=RED)
+        self.allText.add("score", self.score, y=HEIGHT, align = "center")
+        self.allText.add("level", self.displayedLevel, y=HEIGHT, align = "right")
 
     def setBackGround(self):
         self.background = pygame.surface.Surface(SCREENSIZE).convert()
@@ -69,6 +78,7 @@ class GameController(object):
         dt = self.clock.tick(30)/1000.0
         #self.screen.blit(self.background, self.pacman.pos, self.pacman.pos)        
         if not self.paused:
+            self.allText.remove("ghost_score")
             self.pacman.update(dt)
             self.ghosts.update(dt, self.pacman)
             self.checkPelletEvents(dt)
@@ -81,7 +91,11 @@ class GameController(object):
                     #self.pacman.alive = False
                     self.pacman.update(dt)
                     if self.pacman.deathSequenceFinished:
-                        self.restartLevel()
+                        if self.lives > 0:
+                            self.restartLevel()
+                        else:
+                            self.allText.add("game_over_label", "GAME OVER", 
+                                             y=20*HEIGHT, align="center", color=RED)
                 else:
                     self.pauseTimer += dt
                     if self.pauseTimer >= self.pauseTime:
@@ -99,10 +113,13 @@ class GameController(object):
                 exit()
             if event.type == KEYDOWN:
                 if event.key == K_SPACE:
+                    self.allText.remove("start_label")
                     if self.paused:
                         self.playerPaused = False
+                        self.allText.remove("paused_label")
                     else:
                         self.playerPaused = True
+                        self.allText.add("paused_label", "PAUSED", y=20*HEIGHT, align="center", color=GREEN)
                     self.paused = not self.paused
                     
     def checkPelletEvents(self, dt):
@@ -146,6 +163,7 @@ class GameController(object):
         if ghost is not None:
             if ghost.mode.name == "FREIGHT":
                 #self.score += self.ghostScore
+                self.allText.add("ghost_score", self.ghostScore, x=self.pacman.position.x, y=self.pacman.position.y, size=0.5)
                 self.scoreAccumulator += self.ghostScore
                 self.ghostScore *= 2
                 ghost.setRespawnMode()
@@ -195,21 +213,28 @@ class GameController(object):
             
     def increaseLevel(self):
         self.level += 1
+        self.allText.remove("level")
         self.displayedLevel += 1
+        self.allText.add("level", self.displayedLevel, y=HEIGHT, align="right")
         self.level %= self.maxLevels
 
     def applyScore(self):
-        newScore = self.score + self.scoreAccumulator
+        if self.scoreAccumulator > 0:
+            newScore = self.score + self.scoreAccumulator
+        
+            if ((newScore % 10000 - self.score % 10000) < 0 or
+                newScore - self.score >= 10000):
+                if self.lives < self.maxLives:
+                    self.lives += 1
 
-        if ((newScore % 10000 - self.score % 10000) < 0 or
-            newScore - self.score >= 10000):
-            if self.lives < self.maxLives:
-                self.lives += 1
-            #print "New life gained!"
-            #print self.score, newScore
+            #print "Old score = " + str(self.score)
+            self.allText.remove("score")
+            self.score = newScore #+= self.scoreAccumulator
+            #print "New Score = " + str(self.score)
             #print ""
-        self.score += self.scoreAccumulator
-        self.scoreAccumulator = 0
+            self.allText.add("score", self.score, y=HEIGHT, align="center")
+            #self.allText.update(self.score, self.score, align="center")
+            self.scoreAccumulator = 0
         
     
     def render(self):
@@ -220,20 +245,26 @@ class GameController(object):
         #self.screen.blit(self.pacman.image, self.pacman.pos)
         
         #self.nodes.render(self.screen)
-        self.pellets.render(self.screen)
-        if self.fruit is not None:
-            self.fruit.render(self.screen)
         for fruit in self.displayedFruits:
             fruit.render(self.screen)
+        self.pellets.render(self.screen)
             
-        #p = self.pacman.image.get_rect()
-        #self.screen.blit(self.background, p, p)
-        #self.screen.blit(self.pacman.image, p)
-        self.pacman.render(self.screen)
-        if self.pacman.alive:
-            self.ghosts.render(self.screen)
+        if not self.paused:
+            if self.fruit is not None:
+                self.fruit.render(self.screen)
+            self.pacman.render(self.screen)
+            if self.pacman.alive:
+                self.ghosts.render(self.screen)
+        else:
+            if not self.pacman.alive:
+                self.pacman.render(self.screen)
+
         self.lifeIcons.render(self.screen, self.lives-1)
-        
+
+        self.allText.render(self.screen)
+
+        #label = self.font.render(str(self.score), 1, (255, 0, 0))
+        #self.screen.blit(label, (0,0))
         pygame.display.update()
         #pygame.display.update(pacrect)
         
