@@ -5,7 +5,7 @@ class Lives(object):
     def __init__(self, spritesheet):
         #self.image = pygame.image.load("Images/pacman.png").convert()
         self.width, self.height = 32, 32
-        self.image = spritesheet.getImage(1, 0, self.width, self.height)
+        self.image = spritesheet.getImage(0, 0, self.width, self.height)
         #self.image.set_colorkey(TRANSPARENT)
         #self.width, self.height = self.image.get_size()
         self.gap = 10

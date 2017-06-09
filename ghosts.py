@@ -411,6 +411,11 @@ class GhostGroup(object):
         if ghost is not None:
             ghost.exitHome = True
             
-    def render(self,screen):
+    def render(self,screen, nodraw):
         for ghost in self:
-            ghost.render(screen)
+            if nodraw is not None:
+                if nodraw.name != ghost.name:
+                    #print ghost.name
+                    ghost.render(screen)
+            else:
+                ghost.render(screen)

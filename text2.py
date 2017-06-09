@@ -15,7 +15,7 @@ class Text(object):
 class TextGroup(object):
     def __init__(self):
         self.words = []
-        pygame.font.init()
+        #pygame.font.init()
         self.font_path = "PressStart2P.ttf"
         self.font_size = WIDTH
         self.font = pygame.font.Font(self.font_path, self.font_size)

@@ -37,9 +37,10 @@ class GameController(object):
         self.allText.add("hi_score_label", "HI SCORE", align="left")
         self.allText.add("score_label", "SCORE", align="center")
         self.allText.add("level_label", "LEVEL", align="right")
-        self.allText.add("start_label", "START", y=20*HEIGHT, align="center", color=RED)
+        self.allText.add("start_label", "BEGIN", y=20*HEIGHT, align="center", color=YELLOW)
         self.allText.add("score", self.score, y=HEIGHT, align = "center")
-        self.allText.add("level", self.displayedLevel, y=HEIGHT, align = "right")
+        self.allText.add("level", self.displayedLevel, y=2*HEIGHT, align = "right")
+        self.ghostEaten = None
 
     def setBackGround(self):
         self.background = pygame.surface.Surface(SCREENSIZE).convert()
@@ -73,6 +74,7 @@ class GameController(object):
         self.playerPaused = True
         self.restartDelay = False
         self.scoreAccumulator = 0
+        self.allText.add("start_label", "BEGIN", y=20*HEIGHT, align="center", color=YELLOW)
         
     def update(self):
         dt = self.clock.tick(30)/1000.0
@@ -160,10 +162,13 @@ class GameController(object):
                 
     def checkGhostEvents(self, dt):
         ghost = self.pacman.eatGhost(self.ghosts)
+        self.ghostEaten = None
         if ghost is not None:
             if ghost.mode.name == "FREIGHT":
+                self.ghostEaten = ghost
                 #self.score += self.ghostScore
-                self.allText.add("ghost_score", self.ghostScore, x=self.pacman.position.x, y=self.pacman.position.y, size=0.5)
+                self.allText.add("ghost_score", self.ghostScore, 
+                                 x=ghost.position.x, y=ghost.position.y, size=0.5)
                 self.scoreAccumulator += self.ghostScore
                 self.ghostScore *= 2
                 ghost.setRespawnMode()
@@ -254,10 +259,13 @@ class GameController(object):
                 self.fruit.render(self.screen)
             self.pacman.render(self.screen)
             if self.pacman.alive:
-                self.ghosts.render(self.screen)
+                self.ghosts.render(self.screen, self.ghostEaten)
         else:
             if not self.pacman.alive:
                 self.pacman.render(self.screen)
+            else:
+                if not self.playerPaused:
+                    self.ghosts.render(self.screen, self.ghostEaten)
 
         self.lifeIcons.render(self.screen, self.lives-1)
 

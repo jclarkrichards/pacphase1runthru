@@ -8,7 +8,7 @@ class Pellet(object):
         self.name = "pellet"
         self.position = Vector2D(x, y)
         self.color = YELLOW
-        self.radius = 4
+        self.radius = 2
         self.value = 10
         
     def render(self, screen):
